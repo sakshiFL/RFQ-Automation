@@ -80,6 +80,15 @@ async function createProject(customerName) {
     },
   ]);
 
+  // Insert into the model used for dashboard visualization
+  await odooCall("x_task_dashboard", "create", [
+    {
+      x_projectId: projectId,
+      x_name: projectName,
+      x_status: "RFQ Creation"
+    }
+  ])
+
   return {
     projectId,
     projectName,
@@ -97,6 +106,16 @@ async function createTask(TaskName, projectId , description , NodeName ) {
       x_studio_node_name: NodeName,
     },
   ]);
+
+  //For each task creation update the status of project to that task
+  const projectStatusId = await odooCall("x_task_dashboard", "search", [
+    [["x_projectId", "=", "PROJECT_001"]]
+  ])
+
+  await odooCall("x_task_dashboard", "write", [
+    projectStatusId,
+    { x_status: NodeName }
+  ])
 
   return {
     taskId,
