@@ -101,7 +101,7 @@ async function createTask(TaskName) {
 }
 
 
-function createProjectDummy(customerName) {
+async function createProjectDummy(customerName) {
   return {
     projectId: Math.floor(Math.random() * 1000), // random ID
     projectName: `${customerName} - RFQ`,
@@ -111,7 +111,7 @@ function createProjectDummy(customerName) {
 }
 
 module.exports = {
-  createProject, createProjectDummy
+  createProject, createProjectDummy, createTask
 };
 
 

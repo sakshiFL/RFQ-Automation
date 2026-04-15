@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 // const { uploadToDrive } = require("../services/googleDrive");
 // const { getSessionId } = require("../services/odoo");
-const { createProject } = require("../services/odoo");
+const { createProject , createTask } = require("../services/odoo");
 const { createProjectDummy } = require("../services/odoo");
 
 const upload = multer({
@@ -79,23 +79,21 @@ const driveResult = {
     console.log(odooResult); 
     
     if(odooResult){
-        const dummyJson = createProjectDummy(customerName);
+        const dummyJson = await createProjectDummy(customerName);
         if(dummyJson){
-            const taskResult = createTask(customerName);
+            const taskResult = await createTask(customerName);
+            console.log(taskResult); 
         }
-        console.log(taskResult); 
         
     } 
 
 
-    // res.json({
-    //   message: "RFQ submitted successfully",
-    //   customerName,
-    // //   rfqType,
-    // //   category,
-    // //   drive: driveResult,
-    //   odoo: odooResult,
-    // });
+    res.json({
+      message: "RFQ submitted successfully",
+      customerName,
+      odoo: odooResult,
+    });
+    return res
   } catch (err) {
     console.error("FULL ERROR:", err);
     console.error("STACK:", err.stack);
