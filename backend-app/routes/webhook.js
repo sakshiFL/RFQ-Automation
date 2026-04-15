@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createTask } = require("../services/odoo");
+const { createTask, createPurchaseOrder } = require("../services/odoo");
 
 /**
  * Process webhook data and create task
@@ -25,12 +25,52 @@ async function processApprovedWebhook(webhookData) {
 
     console.log(`✅ Creating new task in Odoo for project_id: ${projectId}`);
 
-    // Task details
-    const taskName = "CostName";
+    // Extract node name and approval status from webhook
+    const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
+    const isApproved = webhookData.approved || webhookData.is_approved || webhookData.data?.approved;
+    const partnerId = webhookData.partner_id || webhookData.data?.partner_id || 5;
+    const inputType = webhookData.x_studio_input_type || webhookData.data?.x_studio_input_type || "2D & 3D type";
+    
+    console.log(`Current node name: ${currentNodeName}`);
+    console.log(`Approval status: ${isApproved}`);
+
+    // Check if we should create a purchase order
+    if (currentNodeName === "RFQ Quotation Generation" && isApproved) {
+      console.log("🛒 Creating Purchase Order (Approved RFQ Quotation)");
+      
+      const purchaseOrderResult = await createPurchaseOrder(partnerId, inputType);
+      
+      console.log("🎉 Purchase Order created successfully:", purchaseOrderResult);
+      
+      return {
+        success: true,
+        purchaseOrder: purchaseOrderResult,
+        project_id: projectId,
+        triggered_by: "approved_quotation"
+      };
+    }
+
+    // Otherwise, create task based on current node
+    let taskName;
+    let nextNodeName;
+
+    if (currentNodeName === "Data Extraction") {
+      taskName = "Review Cost Estimate";
+      nextNodeName = "Costing";
+    } else if (currentNodeName === "Costing") {
+      taskName = "Review Client Quotation";
+      nextNodeName = "RFQ Quotation Generation";
+    } else {
+      taskName = "New Task";
+      nextNodeName = currentNodeName || "General";
+    }
+
     const description = webhookData.description || webhookData.data?.description || "Task created from webhook";
 
+    console.log(`📝 Creating task: "${taskName}" with node: "${nextNodeName}"`);
+
     // Create task in Odoo
-    const taskResult = await createTask(taskName, projectId, description);
+    const taskResult = await createTask(taskName, projectId, description, nextNodeName);
     
     console.log("🎉 Task created successfully:", taskResult);
     

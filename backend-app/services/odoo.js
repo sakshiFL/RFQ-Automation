@@ -86,14 +86,15 @@ async function createProject(customerName) {
   };
 }
 
-async function createTask(TaskName, projectId , description) {
+async function createTask(TaskName, projectId , description , NodeName ) {
   const Task = `${TaskName}`;
 
   const taskId = await odooCall("project.task", "create", [
     {
       name: Task,
       project_id: projectId,
-      description
+      description,
+      x_studio_node_name: NodeName,
     },
   ]);
 
@@ -113,8 +114,26 @@ async function createProjectDummy(customerName) {
   };
 }
 
+/**
+ * ✅ CREATE PURCHASE ORDER
+ */
+async function createPurchaseOrder(partnerId, inputType) {
+  const purchaseOrderId = await odooCall("purchase.order", "create", [
+    {
+      partner_id: partnerId,
+      x_studio_input_type: inputType || "2D & 3D type",
+    },
+  ]);
+
+  return {
+    purchaseOrderId,
+    partnerId,
+    inputType,
+  };
+}
+
 module.exports = {
-  createProject, createProjectDummy, createTask
+  createProject, createProjectDummy, createTask, createPurchaseOrder
 };
 
 

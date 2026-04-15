@@ -69,7 +69,7 @@ router.post("/submit", upload.single("file"), async (req, res) => {
       const dummyJson = await createProjectDummy(customerName);
       
       if (dummyJson) {
-        const taskResult = await createTask(customerName, odooResult.projectId , driveLink);
+        const taskResult = await createTask(customerName, odooResult.projectId , driveLink , "Data Extraction");
         console.log(taskResult);
         mappedObject.task = taskResult;
       }
