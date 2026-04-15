@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch with Nodemon",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/backend-app/index.js",
+      "envFile": "${workspaceFolder}/backend-app/.env",
+      "console": "integratedTerminal",
+      "restart": true,
+      "runtimeExecutable": "${workspaceFolder}/backend-app/node_modules/.bin/nodemon",
+      "runtimeArgs": ["--inspect"]
+    }
+  ]
+}
+ 
