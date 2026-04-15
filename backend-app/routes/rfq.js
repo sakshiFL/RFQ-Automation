@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 // const { uploadToDrive } = require("../services/googleDrive");
 // const { getSessionId } = require("../services/odoo");
-const { createProject , createTask } = require("../services/odoo");
+const { createProject, createTask } = require("../services/odoo");
 const { createProjectDummy } = require("../services/odoo");
 
 const upload = multer({
@@ -19,6 +19,7 @@ const upload = multer({
 });
 
 router.post("/submit", upload.single("file"), async (req, res) => {
+  let mappedObject = {};
   try {
     const { customerName, rfqType, category } = req.body;
 
@@ -30,67 +31,55 @@ router.post("/submit", upload.single("file"), async (req, res) => {
       return res.status(400).json({ message: "A ZIP file is required." });
     }
 
-//     // 1. Upload file to Google Drive
-//     const driveResult = await uploadToDrive({
-//       fileName: req.file.originalname,
-//       mimeType: "application/zip",
-//       buffer: req.file.buffer,
-//       customerName,
-//       rfqType,
-//       category,
-//     });
-// console.log(driveResult.fileUrl , "      driveFileUrl: driveResult.fileUrl,");
-// console.log(clientFolderId);
-// console.log(process.env.GOOGLE_DRIVE_FOLDER_ID);
+    const fs = require("fs");
+    const path = require("path");
 
-const fs = require("fs");
-const path = require("path");
+    // Create folder: uploads/customerName
+    const uploadDir = path.join(__dirname, "../uploads", customerName);
 
-// Create folder: uploads/customerName
-const uploadDir = path.join(__dirname, "../uploads", customerName);
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+    // Create unique file name
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const fileName = `${customerName}_${rfqType}_${category}_${timestamp}.zip`.replace(/\s+/g, "_");
 
-// Create unique file name
-const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-const fileName = `${customerName}_${rfqType}_${category}_${timestamp}.zip`.replace(/\s+/g, "_");
+    const filePath = path.join(uploadDir, fileName);
 
-const filePath = path.join(uploadDir, fileName);
+    // Save file
+    fs.writeFileSync(filePath, req.file.buffer);
 
-// Save file
-fs.writeFileSync(filePath, req.file.buffer);
+    console.log("File saved at:", filePath);
 
-console.log("File saved at:", filePath);
+    // Fake drive response (so your flow doesn't break)
+    const driveResult = {
+      fileName,
+      fileUrl: filePath,
+    };
 
-// Fake drive response (so your flow doesn't break)
-const driveResult = {
-  fileName,
-  fileUrl: filePath,
-};
-
-    // let auth = await getSessionId();
-
-    // console.log(auth);
-    
-    // 2. Create Odoo project + task
     const odooResult = await createProject(customerName);
-    console.log(odooResult); 
+    console.log(odooResult);
+    mappedObject = {
+      project: odooResult,
+      task: null
+    };
     
-    if(odooResult){
-        const dummyJson = await createProjectDummy(customerName);
-        if(dummyJson){
-            const taskResult = await createTask(customerName, odooResult.projectId);
-            console.log(taskResult); 
-        }
-        
-    } 
+    if (odooResult) {
+      const dummyJson = await createProjectDummy(customerName);
+      
+      if (dummyJson) {
+        const taskResult = await createTask(customerName, odooResult.projectId);
+        console.log(taskResult);
+        mappedObject.task = taskResult;
+      }
+
+    }
 
     res.json({
       message: "RFQ submitted successfully",
       customerName,
-      odoo: odooResult,
+      odoo: mappedObject,
     });
     return res
   } catch (err) {
@@ -98,9 +87,9 @@ const driveResult = {
     console.error("STACK:", err.stack);
 
     res.status(500).json({
-        message: err.message || "Internal server error"
+      message: err.message || "Internal server error"
     });
-    }
+  }
 });
 
 // Multer error handler
