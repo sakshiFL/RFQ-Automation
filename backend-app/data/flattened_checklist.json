@@ -1,0 +1,480 @@
+{
+  "rfq_meta": {
+    "customer": "857-37",
+    "requisition_type": "Product Development/ Quote",
+    "prepared_by": null,
+    "authorized_by": null,
+    "checklist_ref": "R-DD-03"
+  },
+  "parts": [
+    {
+      "part_name": "Impeller 6CHC",
+      "drawing_number": "C07101B_6CHC",
+      "current_material": "SS316",
+      "annual_volume": 3200,
+      "remarks": null,
+      "material_options": [
+        {
+          "material_name": "NORYL FE1630PW",
+          "grade": "FE1630PW",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": null
+        },
+        {
+          "material_name": "FORTRON 1140L4",
+          "grade": "1140L4",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": "PPS"
+        }
+      ],
+      "weight_info": {
+        "net_weight": 0.93,
+        "finish_weight_kg": 0.2,
+        "weight_unit": "kg"
+      },
+      "color_options": [],
+      "part_variations": [
+        {
+          "spn": "C07101B_6CHC",
+          "description": "IMPELLER 6CHC-SST",
+          "applicable_to": "1B235 pattern, 2.05 LB [0.93 KG], MOI-0.031 LB-FT2"
+        }
+      ],
+      "client_inputs": {
+        "annual_volume": null,
+        "target_price": null,
+        "lead_time": null,
+        "requested_cavities": [],
+        "tooling_requirements": [
+          "Inspect with GO/NO-GO gauge on tapered bore",
+          "Chuck on bore surface for first operation",
+          "Align surfaces during first operation"
+        ],
+        "packaging_requirements": null
+      },
+      "tolerance_info": {
+        "all_tolerances_mm": [
+          0.05,
+          0.08,
+          0.89,
+          0.04,
+          0.05
+        ],
+        "min_critical_tolerance_mm": 0.04,
+        "gdt_present": true,
+        "requires_post_machining": true
+      },
+      "geometry": {
+        "bounding_box_mm": {
+          "length_mm": 66.5546,
+          "width_mm": 117.669,
+          "height_mm": 117.669,
+          "diagonal_mm": 179.2248
+        },
+        "volume_mm3": 117521.0495,
+        "assumed_density_kg_m3": 1650,
+        "surface_area_mm2": 63921.4385,
+        "wall_thickness": {
+          "min_mm": 0.994,
+          "max_mm": 56.968,
+          "avg_mm": 9.3216,
+          "samples": 80
+        },
+        "min_edge_radius_mm": 0.254
+      },
+      "topology": {
+        "solid_count": 1,
+        "face_analysis": {
+          "total_faces": 210,
+          "total_edges": 608,
+          "total_vertices": 386,
+          "face_types": {
+            "plane": 4,
+            "cylinder": 8,
+            "cone": 28,
+            "sphere": 0,
+            "torus": 32,
+            "other": 138
+          }
+        },
+        "has_undercuts": true
+      }
+    },
+    {
+      "part_name": "Impeller 12CHC",
+      "drawing_number": "C07089B_12CHC",
+      "current_material": "SS316",
+      "annual_volume": 400,
+      "remarks": null,
+      "material_options": [
+        {
+          "material_name": "NORYL FE1630PW",
+          "grade": "FE1630PW",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": null
+        },
+        {
+          "material_name": "FORTRON 1140L4",
+          "grade": "1140L4",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": "PPS"
+        }
+      ],
+      "weight_info": {
+        "net_weight": 7.19,
+        "finish_weight_kg": 1.5,
+        "weight_unit": "kg"
+      },
+      "color_options": [],
+      "part_variations": [
+        {
+          "spn": "C07089B_12CHC",
+          "description": "IMPELLER 12CHC SST",
+          "applicable_to": "12CHC"
+        }
+      ],
+      "client_inputs": {
+        "annual_volume": null,
+        "target_price": null,
+        "lead_time": null,
+        "requested_cavities": [],
+        "tooling_requirements": [],
+        "packaging_requirements": null
+      },
+      "tolerance_info": {
+        "all_tolerances_mm": [
+          0.08,
+          0.05,
+          1.14,
+          0.04,
+          0.04
+        ],
+        "min_critical_tolerance_mm": 0.04,
+        "gdt_present": true,
+        "requires_post_machining": true
+      },
+      "geometry": {
+        "bounding_box_mm": {
+          "length_mm": 109.474,
+          "width_mm": 240.3958,
+          "height_mm": 240.3958,
+          "diagonal_mm": 357.1622
+        },
+        "volume_mm3": 908301.3884,
+        "assumed_density_kg_m3": 1650,
+        "surface_area_mm2": 266131.8532,
+        "wall_thickness": {
+          "min_mm": 0.002,
+          "max_mm": 181.748,
+          "avg_mm": 27.9122,
+          "samples": 63
+        },
+        "min_edge_radius_mm": 0.254
+      },
+      "topology": {
+        "solid_count": 1,
+        "face_analysis": {
+          "total_faces": 271,
+          "total_edges": 681,
+          "total_vertices": 398,
+          "face_types": {
+            "plane": 4,
+            "cylinder": 6,
+            "cone": 30,
+            "sphere": 0,
+            "torus": 38,
+            "other": 193
+          }
+        },
+        "has_undercuts": true
+      },
+      "manufacturability": {
+        "estimated_material_cm3": 908.3014,
+        "complexity_score": 8,
+        "undercut_detected": true,
+        "thin_wall_risk": true,
+        "notes": [
+          "Thin wall detected: 0.002 mm \u2014 may cause sink marks or fill issues.",
+          "Undercuts detected \u2014 side actions or lifters likely required, increasing mold cost.",
+          "Very small edge radius (0.254 mm) \u2014 may require EDM or fine tooling."
+        ]
+      }
+    },
+    {
+      "part_name": "Suction bell 6C",
+      "drawing_number": "c02915b_6C",
+      "current_material": "Cast Iron A48 CL30",
+      "annual_volume": 400,
+      "remarks": null,
+      "material_options": [
+        {
+          "material_name": "NORYL FE1630PW",
+          "grade": "FE1630PW",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": null
+        },
+        {
+          "material_name": "FORTRON 1140L4",
+          "grade": "1140L4",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": "PPS"
+        }
+      ],
+      "weight_info": {
+        "net_weight": 3,
+        "finish_weight_kg": 0.8,
+        "weight_unit": "kg"
+      },
+      "color_options": [],
+      "part_variations": [
+        {
+          "spn": "01",
+          "description": "NO RING",
+          "applicable_to": "X = 2.887-2.889 [73,33-73,38]"
+        },
+        {
+          "spn": "02",
+          "description": "ONE RING",
+          "applicable_to": "X = 3.189-3.190 [81,00-81,02]"
+        },
+        {
+          "spn": "03",
+          "description": "TWO RING",
+          "applicable_to": "X = 3.493-3.494 [88,72-88,75]"
+        },
+        {
+          "spn": "04",
+          "description": "NO RING GAL.",
+          "applicable_to": "X = 2.892-2.893 [73,46-73,48]"
+        }
+      ],
+      "client_inputs": {
+        "annual_volume": null,
+        "target_price": null,
+        "lead_time": null,
+        "requested_cavities": [],
+        "tooling_requirements": [],
+        "packaging_requirements": null
+      },
+      "tolerance_info": {
+        "all_tolerances_mm": [
+          0.05,
+          0.05,
+          0.79,
+          0.13,
+          0.04,
+          0.04,
+          0.02,
+          0.02,
+          0.03,
+          0.88,
+          0.11
+        ],
+        "min_critical_tolerance_mm": 0.02,
+        "gdt_present": true,
+        "requires_post_machining": true
+      },
+      "geometry": {
+        "bounding_box_mm": {
+          "length_mm": 139.7,
+          "width_mm": 168.6406,
+          "height_mm": 168.6406,
+          "diagonal_mm": 276.3972
+        },
+        "volume_mm3": 470252.274,
+        "assumed_density_kg_m3": 1650,
+        "surface_area_mm2": 129226.3878,
+        "wall_thickness": {
+          "min_mm": 0.917,
+          "max_mm": 90.5,
+          "avg_mm": 14.2288,
+          "samples": 95
+        },
+        "min_edge_radius_mm": 1.27
+      },
+      "topology": {
+        "solid_count": 1,
+        "face_analysis": {
+          "total_faces": 469,
+          "total_edges": 1275,
+          "total_vertices": 830,
+          "face_types": {
+            "plane": 53,
+            "cylinder": 24,
+            "cone": 24,
+            "sphere": 0,
+            "torus": 19,
+            "other": 349
+          }
+        },
+        "has_undercuts": true
+      },
+      "manufacturability": {
+        "estimated_material_cm3": 470.2523,
+        "complexity_score": 8,
+        "undercut_detected": true,
+        "thin_wall_risk": true,
+        "notes": [
+          "Thin wall detected: 0.917 mm \u2014 may cause sink marks or fill issues.",
+          "Undercuts detected \u2014 side actions or lifters likely required, increasing mold cost."
+        ]
+      }
+    },
+    {
+      "part_name": "Suction bell 14RJ",
+      "drawing_number": "c00885b_14rjc",
+      "current_material": "Cast Iron A48 CL30",
+      "annual_volume": 400,
+      "remarks": null,
+      "material_options": [
+        {
+          "material_name": "NORYL FE1630PW",
+          "grade": "FE1630PW",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": null
+        },
+        {
+          "material_name": "FORTRON 1140L4",
+          "grade": "1140L4",
+          "certifications": [
+            "NSF61"
+          ],
+          "notes": "PPS"
+        }
+      ],
+      "weight_info": {
+        "net_weight": 32.1,
+        "finish_weight_kg": 7.4,
+        "weight_unit": "kg"
+      },
+      "color_options": [],
+      "part_variations": [
+        {
+          "spn": "01",
+          "description": "NO RING",
+          "applicable_to": "X dimension: 7.518-7.520"
+        },
+        {
+          "spn": "02",
+          "description": "ONE RING",
+          "applicable_to": "X dimension: 8.133-8.135"
+        },
+        {
+          "spn": "03",
+          "description": "TWO RING",
+          "applicable_to": "X dimension: 8.745-8.747"
+        },
+        {
+          "spn": "04",
+          "description": "NO RING GALLING",
+          "applicable_to": "X dimension: 7.527-7.529"
+        }
+      ],
+      "client_inputs": {
+        "annual_volume": null,
+        "target_price": null,
+        "lead_time": null,
+        "requested_cavities": [],
+        "tooling_requirements": [],
+        "packaging_requirements": null
+      },
+      "tolerance_info": {
+        "all_tolerances_mm": [
+          0.05,
+          0.05,
+          0.79,
+          0.13,
+          0.04,
+          0.1,
+          0.04,
+          0.1,
+          1.26
+        ],
+        "min_critical_tolerance_mm": 0.04,
+        "gdt_present": true,
+        "requires_post_machining": true
+      },
+      "geometry": {
+        "bounding_box_mm": {
+          "length_mm": 305.5377,
+          "width_mm": 439.8842,
+          "height_mm": 439.8842,
+          "diagonal_mm": 693.0725
+        },
+        "volume_mm3": 4460232.3964,
+        "assumed_density_kg_m3": 1650,
+        "surface_area_mm2": 569200.1277,
+        "wall_thickness": {
+          "min_mm": 5.549,
+          "max_mm": 256.812,
+          "avg_mm": 48.3489,
+          "samples": 62
+        },
+        "min_edge_radius_mm": 2.286
+      },
+      "topology": {
+        "solid_count": 1,
+        "face_analysis": {
+          "total_faces": 396,
+          "total_edges": 1097,
+          "total_vertices": 723,
+          "face_types": {
+            "plane": 29,
+            "cylinder": 44,
+            "cone": 12,
+            "sphere": 0,
+            "torus": 22,
+            "other": 289
+          }
+        },
+        "has_undercuts": true
+      },
+      "manufacturability": {
+        "estimated_material_cm3": 4460.2324,
+        "complexity_score": 7,
+        "undercut_detected": true,
+        "thin_wall_risk": false,
+        "notes": [
+          "Undercuts detected \u2014 side actions or lifters likely required, increasing mold cost."
+        ]
+      }
+    }
+  ],
+  "mold_requirements": {
+    "recommended_mold_material": null,
+    "number_of_cavities": null,
+    "mold_life_total_qty": null,
+    "qty_per_month": null,
+    "cycle_time_expected_sec": null,
+    "cooling_nipple_threading": null,
+    "standard_parts_make": null,
+    "lifting_hook_threading": null,
+    "mold_cost_expected": null,
+    "samples_required_for_approval": null,
+    "delivery_mode": null,
+    "mold_loading_arrangement": null,
+    "mold_acceptance_criteria": null,
+    "spares_to_be_supplied": []
+  },
+  "email_context": {
+    "rfq_scope": [
+      "feasibility of converting parts to plastic",
+      "part cost",
+      "tooling cost"
+    ]
+  }
+}

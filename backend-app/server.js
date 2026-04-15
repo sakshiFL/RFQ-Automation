@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const rfqRoutes = require("./routes/rfq");
+const webhookRoutes = require("./routes/webhook");
 const fs = require("fs");
 const { google } = require("googleapis");
 const { createOAuthClient } = require("./services/googleDrive");
@@ -11,9 +12,11 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api/rfq", rfqRoutes);
+app.use("/api/webhook", webhookRoutes);
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 

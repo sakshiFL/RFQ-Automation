@@ -5,7 +5,7 @@ const multer = require("multer");
 // const { getSessionId } = require("../services/odoo");
 const { createProject, createTask } = require("../services/odoo");
 const { createProjectDummy } = require("../services/odoo");
-
+let driveLink = `https://docs.google.com/spreadsheets/d/1I14OyWPDSL-DR-QkWW2OWpIxyrPQHHh7/edit?usp=sharing&ouid=108065393827917820463&rtpof=true&sd=true`;
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
@@ -69,7 +69,7 @@ router.post("/submit", upload.single("file"), async (req, res) => {
       const dummyJson = await createProjectDummy(customerName);
       
       if (dummyJson) {
-        const taskResult = await createTask(customerName, odooResult.projectId);
+        const taskResult = await createTask(customerName, odooResult.projectId , driveLink);
         console.log(taskResult);
         mappedObject.task = taskResult;
       }

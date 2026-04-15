@@ -86,13 +86,14 @@ async function createProject(customerName) {
   };
 }
 
-async function createTask(TaskName, projectId) {
+async function createTask(TaskName, projectId , description) {
   const Task = `${TaskName}`;
 
   const taskId = await odooCall("project.task", "create", [
     {
       name: Task,
-      project_id: projectId
+      project_id: projectId,
+      description
     },
   ]);
 
