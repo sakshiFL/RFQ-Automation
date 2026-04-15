@@ -81,12 +81,11 @@ const driveResult = {
     if(odooResult){
         const dummyJson = await createProjectDummy(customerName);
         if(dummyJson){
-            const taskResult = await createTask(customerName);
+            const taskResult = await createTask(customerName, odooResult.projectId);
             console.log(taskResult); 
         }
         
     } 
-
 
     res.json({
       message: "RFQ submitted successfully",
