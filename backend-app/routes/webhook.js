@@ -25,18 +25,16 @@ async function processApprovedWebhook(webhookData) {
 
     console.log(`✅ Creating new task in Odoo for project_id: ${projectId}`);
 
-    // Extract node name and approval status from webhook
+    // Extract node name from webhook
     const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
-    const isApproved = webhookData.approved || webhookData.is_approved || webhookData.data?.approved;
     const partnerId = webhookData.partner_id || webhookData.data?.partner_id || 5;
     const inputType = webhookData.x_studio_input_type || webhookData.data?.x_studio_input_type || "2D & 3D type";
     
     console.log(`Current node name: ${currentNodeName}`);
-    console.log(`Approval status: ${isApproved}`);
 
-    // Check if we should create a purchase order
-    if (currentNodeName === "RFQ Quotation Generation" && isApproved) {
-      console.log("🛒 Creating Purchase Order (Approved RFQ Quotation)");
+    // Check if node is "RFQ Quotation Generation" - create purchase order
+    if (currentNodeName === "RFQ Quotation Generation") {
+      console.log("🛒 Creating Purchase Order for RFQ Quotation Generation");
       
       const purchaseOrderResult = await createPurchaseOrder(partnerId, inputType);
       
@@ -46,7 +44,7 @@ async function processApprovedWebhook(webhookData) {
         success: true,
         purchaseOrder: purchaseOrderResult,
         project_id: projectId,
-        triggered_by: "approved_quotation"
+        triggered_by: "rfq_quotation_generation"
       };
     }
 
