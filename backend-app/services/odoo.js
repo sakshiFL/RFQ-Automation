@@ -109,7 +109,7 @@ async function createTask(TaskName, projectId , description , NodeName ) {
 
   //For each task creation update the status of project to that task
   const projectStatusId = await odooCall("x_task_dashboard", "search", [
-    [["x_projectId", "=", "PROJECT_001"]]
+    [["x_projectId", "=", projectId]]
   ])
 
   await odooCall("x_task_dashboard", "write", [
