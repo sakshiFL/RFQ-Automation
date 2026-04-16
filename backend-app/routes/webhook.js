@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createTask, createPurchaseOrder } = require("../services/odoo");
-const { cancelTask, getTaskById } = require("../services/odoo");
-
+const { createTask, createPurchaseOrder, cancelTask, getTaskById, odooCall } = require("../services/odoo");
 /**
  * Process webhook data and create task
  * @param {Object} webhookData - Data received from Odoo webhook
@@ -30,17 +28,52 @@ async function processApprovedWebhook(webhookData) {
     const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
     const partnerId = webhookData.partner_id || webhookData.data?.partner_id || 5;
     const inputType = webhookData.x_studio_input_type || webhookData.data?.x_studio_input_type || "2D & 3D type";
-    
+    const state = webhookData.state || webhookData.data?.state || "03_approved";
     console.log(`Current node name: ${currentNodeName}`);
+console.log(`Current state: ${state}`);
+console.log(webhookData.state , "-----------------STATE------------------");
 
     // Check if node is "RFQ Quotation Generation" - create purchase order
     if (currentNodeName === "RFQ Quotation Generation") {
-      console.log("🛒 Creating Purchase Order for RFQ Quotation Generation");
-      
       const purchaseOrderResult = await createPurchaseOrder(partnerId, inputType);
+      console.log("this is 39");
       
+      if(state == "03_approved"){
+        console.log("Updating status to 'Quotation Generated'");
+
+        // Extract description/link from webhook
+        const description = webhookData.description || webhookData.data?.description || "";
+        
+        // Extract URL from description if it contains one
+        const urlMatch = description.match(/(https?:\/\/[^\s]+)/);
+        const extractedLink = urlMatch ? urlMatch[0] : description;
+
+        // First, search for the dashboard record with this projectId
+        const dashboardRecordIds = await odooCall("x_task_dashboard", "search", [
+          [["x_projectId", "=", projectId]]
+        ]);
+
+        console.log("Dashboard Record IDs found:", dashboardRecordIds);
+        console.log("Extracted link:", extractedLink);
+
+        if (dashboardRecordIds && dashboardRecordIds.length > 0) {
+          // Update the status and link
+          await odooCall("x_task_dashboard", "write", [
+            dashboardRecordIds,
+            { 
+              x_status: "Quotation Generated",
+              x_link: extractedLink
+            }
+          ]);
+          console.log("✅ Status updated to 'Quotation Generated' with link");
+        } else {
+          console.warn("⚠️ No dashboard record found for project_id:", projectId);
+        }
+      }
+      // Update project status to "Quotation Generated"
+
       console.log("🎉 Purchase Order created successfully:", purchaseOrderResult);
-      
+
       return {
         success: true,
         purchaseOrder: purchaseOrderResult,
