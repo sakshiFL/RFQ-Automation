@@ -92,46 +92,32 @@ async function processChangeRequestedWebhook(webhookData) {
   try {
     console.log("🔄 Processing Change Requested Webhook");
 
-    const taskId = webhookData.task_id || webhookData.data?.task_id;
+    const taskId = webhookData.id || webhookData.data?.id;
 
     if (!taskId) {
       return { success: false, error: "Missing task_id" };
     }
+    const taskName = webhookData.display_name || webhookData.data?.display_name;
+    const description = webhookData.description || webhookData.data?.description || "Task created from webhook";
 
     const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
-    const partnerId = webhookData.partner_id || webhookData.data?.partner_id || 5;
-    const inputType = webhookData.x_studio_input_type || webhookData.data?.x_studio_input_type || "2D & 3D type";
+    const projectId = webhookData.project_id || webhookData.data?.project_id;
     
+    console.log(`❌ Cancelling old task: ${taskId}`);
+    await cancelTask(taskId);  
 
-    // 1️⃣ Get existing task details
-    const existingTask = await getTaskById(taskId);
+    const newTaskName = `${taskName} - Revised_1`;
 
-    if (!existingTask) {
-      return { success: false, error: "Task not found" };
-    }
-
-    console.log("📄 Existing Task:", existingTask);
-
-    // 2️⃣ Cancel existing task
-    await cancelTask(taskId);
-    console.log(`❌ Task ${taskId} cancelled`);
-
-    // 3️⃣ Create new task with same data
-    const newTaskName = existingTask.name + " (Revised)";
+    // Create task in Odoo
+    const taskResult = await createTask(newTaskName, projectId, description, currentNodeName);
     
-    const newTask = await createTask(
-      newTaskName,
-      existingTask.project_id[0],
-      existingTask.description,
-      existingTask.x_studio_node_name // or whatever field you use
-    );
-
-    console.log("✅ New Task Created:", newTask);
+    console.log("🎉 Task created successfully:", taskResult);
 
     return {
       success: true,
-      old_task_id: taskId,
-      new_task: newTask
+      task: taskResult,
+      project_id: projectId,
+      triggered_by: "webhook"
     };
 
   } catch (error) {
@@ -177,6 +163,13 @@ router.post("/odoo", express.json(), async (req, res) => {
 router.post("/odoo/change-requested", express.json(), async (req, res) => {
   try {
     console.log("🔄 Change Requested Webhook Received");
+    console.log("========================================");
+    console.log("📥 Odoo Webhook Received");
+    console.log("========================================");
+    console.log("Timestamp:", new Date().toISOString());
+    console.log("Headers:", JSON.stringify(req.headers, null, 2));
+    console.log("Body:", JSON.stringify(req.body, null, 2));
+    console.log("========================================");
 
     const result = await processChangeRequestedWebhook(req.body);
 
