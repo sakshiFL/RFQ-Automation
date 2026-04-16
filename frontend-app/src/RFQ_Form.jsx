@@ -73,31 +73,6 @@ export default function RFQForm() {
       <div className="success-card">
         <div className="success-icon">✓</div>
         <h2>RFQ Submitted Successfully</h2>
-        <div className="result-grid">
-          <ResultRow label="Customer" value={result.customerName} />
-          
-          {result.odoo?.project && (
-            <ResultRow 
-              label="Odoo Project" 
-              value={`${result.odoo.project.projectName || 'N/A'} (ID: ${result.odoo.project.projectId})`} 
-            />
-          )}
-          
-          {result.odoo?.task && (
-            <ResultRow 
-              label="Odoo Task" 
-              value={result.odoo.task.taskName ? `${result.odoo.task.taskName} (ID: ${result.odoo.task.taskId})` : `Task ID: ${result.odoo.task.taskId}`}
-            />
-          )}
-          
-          {result.odoo?.drive && (
-            <ResultRow 
-              label="Drive File" 
-              value={result.odoo.drive.fileName || 'Uploaded'} 
-              link={result.odoo.drive.fileUrl} 
-            />
-          )}
-        </div>
         <button className="btn-primary" onClick={reset}>Submit Another RFQ</button>
       </div>
     );
