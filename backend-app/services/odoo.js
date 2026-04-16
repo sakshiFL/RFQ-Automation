@@ -130,15 +130,26 @@ async function cancelTask(taskId) {
   //   throw new Error("CANCEL_STAGE_ID is not defined in env");
   // }
 
+  if (!taskId) {
+    throw new Error("taskId is required to cancel task");
+  }
+
+  const vals = {
+    state: "1_canceled" // your custom state
+  };
+
+   console.log("❌ Cancelling task:", taskId, "with vals:", vals);
+
   await odooCall("project.task", "write", [
     [taskId],
-    { state: "02_changes_requested" }
+    vals
   ]);
 
   return {
     taskId,
     status: "cancelled"
   };
+  
 }
 
 
