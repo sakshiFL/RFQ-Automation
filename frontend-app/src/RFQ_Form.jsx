@@ -159,7 +159,6 @@ export default function RFQForm() {
             />
             {file ? (
               <div className="file-info">
-                <span className="file-icon">📦</span>
                 <div>
                   <p className="file-name">{file.name}</p>
                   <p className="file-size">{(file.size / 1024).toFixed(1)} KB</p>

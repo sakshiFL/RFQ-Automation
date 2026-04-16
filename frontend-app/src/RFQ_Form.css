@@ -183,11 +183,6 @@ select {
   text-align: left;
 }
 
-.file-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
 .file-name {
   font-size: 0.9rem;
   font-weight: 500;
