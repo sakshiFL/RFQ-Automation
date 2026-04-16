@@ -123,6 +123,24 @@ async function createTask(TaskName, projectId , description , NodeName ) {
   };
 }
 
+async function cancelTask(taskId) {
+  // const CANCEL_STAGE_ID = process.env.CANCEL_STAGE_ID; // keep it configurable
+
+  // if (!CANCEL_STAGE_ID) {
+  //   throw new Error("CANCEL_STAGE_ID is not defined in env");
+  // }
+
+  await odooCall("project.task", "write", [
+    [taskId],
+    { state: "02_changes_requested" }
+  ]);
+
+  return {
+    taskId,
+    status: "cancelled"
+  };
+}
+
 
 async function createProjectDummy(customerName) {
   return {
@@ -131,6 +149,14 @@ async function createProjectDummy(customerName) {
     status: "created",
     source: "dummy",
   };
+}
+
+async function cancelTask(taskId) {
+  return await odoo.execute_kw(
+    "project.task",
+    "write",
+    [[taskId], { stage_id: CANCEL_STAGE_ID }]
+  );
 }
 
 /**
@@ -152,7 +178,7 @@ async function createPurchaseOrder(partnerId, inputType) {
 }
 
 module.exports = {
-  createProject, createProjectDummy, createTask, createPurchaseOrder
+  createProject, createProjectDummy, createTask, createPurchaseOrder, cancelTask
 };
 
 

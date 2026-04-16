@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { createTask, createPurchaseOrder } = require("../services/odoo");
+const { cancelTask, getTaskById } = require("../services/odoo");
 
 /**
  * Process webhook data and create task
@@ -54,8 +55,8 @@ async function processApprovedWebhook(webhookData) {
 
     if (currentNodeName === "Data Extraction") {
       taskName = "Review Cost Estimate";
-      nextNodeName = "Costing";
-    } else if (currentNodeName === "Costing") {
+      nextNodeName = "Costing Calculation";
+    } else if (currentNodeName === "Costing Calculation") {
       taskName = "Review Client Quotation";
       nextNodeName = "RFQ Quotation Generation";
     } else {
@@ -84,6 +85,58 @@ async function processApprovedWebhook(webhookData) {
       success: false,
       error: error.message
     };
+  }
+}
+
+async function processChangeRequestedWebhook(webhookData) {
+  try {
+    console.log("🔄 Processing Change Requested Webhook");
+
+    const taskId = webhookData.task_id || webhookData.data?.task_id;
+
+    if (!taskId) {
+      return { success: false, error: "Missing task_id" };
+    }
+
+    const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
+    const partnerId = webhookData.partner_id || webhookData.data?.partner_id || 5;
+    const inputType = webhookData.x_studio_input_type || webhookData.data?.x_studio_input_type || "2D & 3D type";
+    
+
+    // 1️⃣ Get existing task details
+    const existingTask = await getTaskById(taskId);
+
+    if (!existingTask) {
+      return { success: false, error: "Task not found" };
+    }
+
+    console.log("📄 Existing Task:", existingTask);
+
+    // 2️⃣ Cancel existing task
+    await cancelTask(taskId);
+    console.log(`❌ Task ${taskId} cancelled`);
+
+    // 3️⃣ Create new task with same data
+    const newTaskName = existingTask.name + " (Revised)";
+    
+    const newTask = await createTask(
+      newTaskName,
+      existingTask.project_id[0],
+      existingTask.description,
+      existingTask.x_studio_node_name // or whatever field you use
+    );
+
+    console.log("✅ New Task Created:", newTask);
+
+    return {
+      success: true,
+      old_task_id: taskId,
+      new_task: newTask
+    };
+
+  } catch (error) {
+    console.error("❌ Error in Change Requested:", error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -117,6 +170,28 @@ router.post("/odoo", express.json(), async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: "Error processing webhook" 
+    });
+  }
+});
+
+router.post("/odoo/change-requested", express.json(), async (req, res) => {
+  try {
+    console.log("🔄 Change Requested Webhook Received");
+
+    const result = await processChangeRequestedWebhook(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Change requested webhook processed",
+      data: result
+    });
+
+  } catch (error) {
+    console.error("❌ Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Error processing change requested webhook"
     });
   }
 });
