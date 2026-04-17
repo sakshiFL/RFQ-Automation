@@ -32,8 +32,8 @@ async function processApprovedWebhook(webhookData) {
     const inputType = webhookData.x_studio_input_type || webhookData.data?.x_studio_input_type || "2D & 3D type";
     const state = webhookData.state || webhookData.data?.state || "03_approved";
     console.log(`Current node name: ${currentNodeName}`);
-console.log(`Current state: ${state}`);
-console.log(webhookData.state , "-----------------STATE------------------");
+    console.log(`Current state: ${state}`);
+    console.log(webhookData.state , "-----------------STATE------------------");
 
     // Check if node is "RFQ Quotation Generation" - create purchase order
     if (currentNodeName === "RFQ Quotation Generation") {
@@ -43,8 +43,6 @@ console.log(webhookData.state , "-----------------STATE------------------");
       if(state == "03_approved"){
         console.log("Updating status to 'Quotation Generated'");
 
-        // Extract description/link from webhook
-        const description = webhookData.description || webhookData.data?.description || "";
         
         // Extract URL from description if it contains one
         const urlMatch = description.match(/(https?:\/\/[^\s]+)/);
@@ -99,7 +97,8 @@ console.log(webhookData.state , "-----------------STATE------------------");
       nextNodeName = currentNodeName || "General";
     }
 
-    const description = webhookData.description || webhookData.data?.description || "Task created from webhook";
+    // Extract description/link from webhook
+    const description = await getTaskDescription(taskName);
 
     console.log(`📝 Creating task: "${taskName}" with node: "${nextNodeName}"`);
 
@@ -189,46 +188,7 @@ async function processChangeRequestedWebhook(webhookData) {
     return { success: false, error: error.message };
   }
 }
-
-// async function processChangeRequestedWebhook(webhookData) {
-//   try {
-//     console.log("🔄 Processing Change Requested Webhook");
-
-//     const taskId = webhookData.id || webhookData.data?.id;
-
-//     if (!taskId) {
-//       return { success: false, error: "Missing task_id" };
-//     }
-//     const taskName = webhookData.display_name || webhookData.data?.display_name;
-//     const description = webhookData.description || webhookData.data?.description || "Task created from webhook";
-//     const attachmentIds = webhookData.attachment_ids || webhookData.data?.attachment_ids || [];
-//     const attachmentId = attachmentIds[0];
-//     const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
-//     const projectId = webhookData.project_id || webhookData.data?.project_id;
-    
-//     console.log(`❌ Cancelling old task: ${taskId}`);
-//     await cancelTask(taskId);  
-
-//     const newTaskName = `${taskName} - Revised_1`;
-
-//     // Create task in Odoo
-//     const taskResult = await createTask(newTaskName, projectId, description, currentNodeName);
-    
-//     console.log("🎉 Task created successfully:", taskResult);
-
-//     return {
-//       success: true,
-//       task: taskResult,
-//       project_id: projectId,
-//       triggered_by: "webhook"
-//     };
-
-//   } catch (error) {
-//     console.error("❌ Error in Change Requested:", error);
-//     return { success: false, error: error.message };
-//   }
-// }
-
+ 
 /**
  * Odoo Webhook Endpoint
  * Receives webhook data from Odoo and logs it
