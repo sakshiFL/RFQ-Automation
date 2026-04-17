@@ -90,6 +90,7 @@ export default function RFQForm() {
         <div className="field">
           <label>Customer Name</label>
           <input
+          style={{minHeight:"4vh"}}
             name="customerName"
             value={form.customerName}
             onChange={handleChange}
