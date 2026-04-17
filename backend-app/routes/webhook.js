@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createTask, createPurchaseOrder } = require("../services/odoo");
+const { createTask, createPurchaseOrder, attachFileToTask, getAttachmentById } = require("../services/odoo");
 const { cancelTask, getTaskById } = require("../services/odoo");
 
 /**
@@ -92,32 +92,61 @@ async function processChangeRequestedWebhook(webhookData) {
   try {
     console.log("🔄 Processing Change Requested Webhook");
 
-    const taskId = webhookData.id || webhookData.data?.id;
+    const data = webhookData.data || webhookData;
+
+    const taskId = data.id;
+    const taskName = data.display_name;
+    const description = data.description || "Task created from webhook";
+    const attachmentIds = data.attachment_ids || [];
+    const currentNodeName = data.x_studio_node_name;
+    const projectId = data.project_id;
 
     if (!taskId) {
       return { success: false, error: "Missing task_id" };
     }
-    const taskName = webhookData.display_name || webhookData.data?.display_name;
-    const description = webhookData.description || webhookData.data?.description || "Task created from webhook";
 
-    const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
-    const projectId = webhookData.project_id || webhookData.data?.project_id;
-    
+    // 📎 STEP 1: Fetch all attachments BEFORE cancelling
+    let attachments = [];
+
+    if (attachmentIds.length > 0) {
+      console.log(`📥 Fetching ${attachmentIds.length} attachments`);
+
+      for (const attId of attachmentIds) {
+        const attachment = await getAttachmentById(taskId, attId);
+        attachments.push(attachment);
+      }
+    }
+
+    // ❌ STEP 2: Cancel old task
     console.log(`❌ Cancelling old task: ${taskId}`);
-    await cancelTask(taskId);  
+    await cancelTask(taskId);
 
-    const newTaskName = `${taskName} - Revised_1`;
+    // 📝 STEP 3: Create revised task
+    const newTaskName = `${taskName} - Revised`;
 
-    // Create task in Odoo
-    const taskResult = await createTask(newTaskName, projectId, description, currentNodeName);
-    
+    const taskResult = await createTask(
+      newTaskName,
+      projectId,
+      description,
+      currentNodeName
+    );
+
     console.log("🎉 Task created successfully:", taskResult);
+
+    // 📎 STEP 4: Re-attach files to new task
+    if (attachments.length > 0) {
+      console.log(`📤 Re-attaching ${attachments.length} files`);
+
+      for (const file of attachments) {
+        await attachFileToTask(taskResult.taskId, file);
+      }
+    }
 
     return {
       success: true,
       task: taskResult,
       project_id: projectId,
-      triggered_by: "webhook"
+      triggered_by: "change_requested"
     };
 
   } catch (error) {
@@ -125,6 +154,45 @@ async function processChangeRequestedWebhook(webhookData) {
     return { success: false, error: error.message };
   }
 }
+
+// async function processChangeRequestedWebhook(webhookData) {
+//   try {
+//     console.log("🔄 Processing Change Requested Webhook");
+
+//     const taskId = webhookData.id || webhookData.data?.id;
+
+//     if (!taskId) {
+//       return { success: false, error: "Missing task_id" };
+//     }
+//     const taskName = webhookData.display_name || webhookData.data?.display_name;
+//     const description = webhookData.description || webhookData.data?.description || "Task created from webhook";
+//     const attachmentIds = webhookData.attachment_ids || webhookData.data?.attachment_ids || [];
+//     const attachmentId = attachmentIds[0];
+//     const currentNodeName = webhookData.x_studio_node_name || webhookData.data?.x_studio_node_name;
+//     const projectId = webhookData.project_id || webhookData.data?.project_id;
+    
+//     console.log(`❌ Cancelling old task: ${taskId}`);
+//     await cancelTask(taskId);  
+
+//     const newTaskName = `${taskName} - Revised_1`;
+
+//     // Create task in Odoo
+//     const taskResult = await createTask(newTaskName, projectId, description, currentNodeName);
+    
+//     console.log("🎉 Task created successfully:", taskResult);
+
+//     return {
+//       success: true,
+//       task: taskResult,
+//       project_id: projectId,
+//       triggered_by: "webhook"
+//     };
+
+//   } catch (error) {
+//     console.error("❌ Error in Change Requested:", error);
+//     return { success: false, error: error.message };
+//   }
+// }
 
 /**
  * Odoo Webhook Endpoint

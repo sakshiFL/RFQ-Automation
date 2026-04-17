@@ -149,9 +149,48 @@ async function cancelTask(taskId) {
     taskId,
     status: "cancelled"
   };
-  
+
 }
 
+async function getAttachmentById(taskId, attachmentId) {
+  const result = await odooCall("ir.attachment", "search_read", [
+    [
+      ["res_model", "=", "project.task"],
+      ["res_id", "=", taskId],
+      ["id", "=", attachmentId]
+    ]
+  ], {
+    fields: ["id", "name", "datas", "mimetype"]
+  });
+
+  if (!result.length) {
+    throw new Error("Attachment not found");
+  }
+
+  return result[0]; // { id, name, datas, mimetype }
+}
+
+async function attachFileToTask(taskId, attachment) {
+  if (!taskId || !attachment?.datas) {
+    throw new Error("Invalid attachment data");
+  }
+
+  const attachmentId = await odooCall("ir.attachment", "create", [
+    {
+      name: attachment.name,
+      type: "binary",
+      datas: attachment.datas,
+      mimetype: attachment.mimetype,
+      res_model: "project.task",
+      res_id: taskId
+    }
+  ]);
+
+  return {
+    newAttachmentId: attachmentId,
+    fileName: attachment.name
+  };
+}
 
 async function createProjectDummy(customerName) {
   return {
@@ -162,13 +201,13 @@ async function createProjectDummy(customerName) {
   };
 }
 
-async function cancelTask(taskId) {
-  return await odoo.execute_kw(
-    "project.task",
-    "write",
-    [[taskId], { stage_id: CANCEL_STAGE_ID }]
-  );
-}
+// async function cancelTask(taskId) {
+//   return await odoo.execute_kw(
+//     "project.task",
+//     "write",
+//     [[taskId], { stage_id: CANCEL_STAGE_ID }]
+//   );
+// }
 
 /**
  * ✅ CREATE PURCHASE ORDER
@@ -189,7 +228,8 @@ async function createPurchaseOrder(partnerId, inputType) {
 }
 
 module.exports = {
-  createProject, createProjectDummy, createTask, createPurchaseOrder, cancelTask
+  createProject, createProjectDummy, createTask, createPurchaseOrder, cancelTask, attachFileToTask,
+  getAttachmentById
 };
 
 
