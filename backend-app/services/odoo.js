@@ -39,33 +39,31 @@ async function getSessionId() {
  * Generic Odoo call
  */
 async function odooCall(model, method, args = [], kwargs = {}) {
-  const sessionId = await getSessionId();
-
-  const response = await axios.post(
-    `${ODOO_URL}/web/dataset/call_kw`,
-    {
-      jsonrpc: "2.0",
-      method: "call",
-      params: {
-        model,
-        method,
-        args,
-        kwargs,
+  try {
+    const sessionId = await getSessionId();
+    const response = await axios.post(
+      `${ODOO_URL}/web/dataset/call_kw`,
+      {
+        jsonrpc: "2.0",
+        method: "call",
+        params: {
+          model,
+          method,
+          args,
+          kwargs,
+        },
       },
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `session_id=${sessionId}`,
-      },
-    }
-  );
-
-  if (response.data.error) {
-    throw new Error(JSON.stringify(response.data.error));
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `session_id=${sessionId}`,
+        },
+      }
+    );
+    return response.data.result;
+  } catch (error) {
+    throw new Error(JSON.stringify(error));
   }
-
-  return response.data.result;
 }
 
 /**
@@ -79,7 +77,7 @@ async function createProject(customerName) {
       name: projectName,
     },
   ]);
-
+// 
   // Insert into the model used for dashboard visualization
   await odooCall("x_task_dashboard", "create", [
     {
@@ -111,6 +109,7 @@ async function createTask(TaskName, projectId , description , NodeName ) {
   const projectStatusId = await odooCall("x_task_dashboard", "search", [
     [["x_projectId", "=", projectId]]
   ])
+console.log(NodeName , "CHANGE THIS NODE NAME -:::::: ---------- ");
 
   await odooCall("x_task_dashboard", "write", [
     projectStatusId,
