@@ -178,7 +178,7 @@ async function getTaskDescription(taskName) {
       return `Please review the cost estimation and validate pricing.\nSheet: https://docs.google.com/spreadsheets/d/1TMiFCp4cHDd913Yh15b_XC6rgCCIIQoV/edit?usp=sharing&ouid=108065393827917820463&rtpof=true&sd=true`;
 
     case "Review Client Quotation":
-      return `Please review the client quotation before final submission.\nSheet: https://docs.google.com/spreadsheets/d/1bhWSQ80BleHUb9vwekljKF-QT7BrNuw2/edit?usp=sharing&ouid=108065393827917820463&rtpof=true&sd=true`;
+      return `Please review the client quotation before final submission and approval.\nSheet: https://docs.google.com/spreadsheets/d/1bhWSQ80BleHUb9vwekljKF-QT7BrNuw2/edit?usp=sharing&ouid=108065393827917820463&rtpof=true&sd=true`;
 
     default:
       return `Please review the task details.\nReference: https://drive.google.com/drive/folders/1LMdPPmoSc9v16tfoKw9vIHaNSuha1cz1?usp=drive_link`;
@@ -234,9 +234,29 @@ async function createPurchaseOrder(partnerId, inputType) {
   };
 }
 
+async function markProjectAsComplete(projectId) {
+  if (!projectId) {
+    throw new Error("projectId is required");
+  }
+
+  console.log("🏁 Marking project as complete:", projectId);
+
+  await odooCall("project.project", "write", [
+    [projectId], // ✅ must be array
+    {
+      last_update_status: "done"
+    }
+  ]);
+
+  return {
+    projectId,
+    status: "completed"
+  };
+}
+
 module.exports = {
   createProject, createProjectDummy, createTask, createPurchaseOrder, cancelTask, attachFileToTask,
-  getAttachmentById, getTaskDescription
+  getAttachmentById, getTaskDescription, markProjectAsComplete
 };
 
  

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { createTask, createPurchaseOrder, attachFileToTask, getAttachmentById } = require("../services/odoo");
-const { cancelTask, getTaskById } = require("../services/odoo");
+const { createTask, createPurchaseOrder, attachFileToTask, getAttachmentById, getTaskDescription } = require("../services/odoo");
+const { cancelTask, markProjectAsComplete } = require("../services/odoo");
 
 /**
  * Process webhook data and create task
@@ -37,11 +37,11 @@ async function processApprovedWebhook(webhookData) {
 
     // Check if node is "RFQ Quotation Generation" - create purchase order
     if (currentNodeName === "RFQ Quotation Generation") {
-      const purchaseOrderResult = await createPurchaseOrder(partnerId, inputType);
-      console.log("this is 39");
-      
-      if(state == "03_approved"){
-        console.log("Updating status to 'Quotation Generated'");
+      // const purchaseOrderResult = await createPurchaseOrder(partnerId, inputType);
+      // console.log("this is 39");
+      const projectApprove = await markProjectAsComplete(projectId);
+      // if(state == "03_approved"){
+      //   console.log("Updating status to 'Quotation Generated'");
 
         
         // Extract URL from description if it contains one
@@ -69,17 +69,20 @@ async function processApprovedWebhook(webhookData) {
         } else {
           console.warn("⚠️ No dashboard record found for project_id:", projectId);
         }
-      }
       // Update project status to "Quotation Generated"
 
-      console.log("🎉 Purchase Order created successfully:", purchaseOrderResult);
+      // console.log("🎉 Purchase Order created successfully:", purchaseOrderResult);
 
       return {
         success: true,
-        purchaseOrder: purchaseOrderResult,
-        project_id: projectId,
-        triggered_by: "rfq_quotation_generation"
+        message: "Project marked as complete"
       };
+      // return {
+      //   success: true,
+      //   purchaseOrder: purchaseOrderResult,
+      //   project_id: projectId,
+      //   triggered_by: "rfq_quotation_generation"
+      // };
     }
 
     // Otherwise, create task based on current node
@@ -92,6 +95,11 @@ async function processApprovedWebhook(webhookData) {
     } else if (currentNodeName === "Costing Calculation") {
       taskName = "Review Client Quotation";
       nextNodeName = "RFQ Quotation Generation";
+    } else if (currentNodeName === "RFQ Quotation Generation") {
+      await markProjectAsComplete(projectId);
+      return {
+        success: true
+      }
     } else {
       taskName = "New Task";
       nextNodeName = currentNodeName || "General";
